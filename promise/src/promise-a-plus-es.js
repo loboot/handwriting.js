@@ -2,10 +2,13 @@
  *  Promise/A+ 规范
  *  ES6实现
  */
+
+// 三种状态 pending 可变 剩下两个状态不可变
 const PENDING = 'pending';
 const FULFILLED = 'fulfilled';
 const REJECTED = 'rejected';
 
+// Promise解决方案 兼容thenable方法
 function resolvePromise(promise2, x, resolve, reject) {
   if (promise2 === x) {
     reject(new TypeError('changing promise'));
@@ -16,27 +19,29 @@ function resolvePromise(promise2, x, resolve, reject) {
       const { then } = x;
 
       if (typeof then === 'function') {
-        then.call(
-          x,
-          (y) => {
-            if (called) return;
-            called = true;
-            resolvePromise(promise2, y, resolve, reject);
-          },
-          (r) => {
-            if (called) return;
-            called = true;
-            reject(r);
-          }
-        );
+        try {
+          then.call(
+            x,
+            (y) => {
+              if (called) return;
+              called = true;
+              resolvePromise(promise2, y, resolve, reject);
+            },
+            (r) => {
+              if (called) return;
+              called = true;
+              reject(r);
+            }
+          );
+        } catch (e) {
+          if (called) return;
+          called = true;
+          reject(e);
+        }
       } else {
-        if (called) return;
-        called = true;
         resolve(x);
       }
     } catch (e) {
-      if (called) return;
-      called = true;
       reject(e);
     }
   } else {
