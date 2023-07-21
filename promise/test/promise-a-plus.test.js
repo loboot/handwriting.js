@@ -1,4 +1,4 @@
-const Promise = require('../promise-a-plus');
+const Promise = require('../src/promise-a-plus');
 
 const fetchData = (id = 1) => {
   const p1 = new Promise((resolve, reject) => {
