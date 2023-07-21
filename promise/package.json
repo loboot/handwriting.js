@@ -1,0 +1,21 @@
+{
+  "name": "promise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "promise.js",
+  "scripts": {
+    "test": "promises-aplus-tests promise-a-plus.js",
+    "test-jest": "jest "
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.42.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "jest": "^29.6.1",
+    "promises-aplus-tests": "^2.1.2"
+  },
+  "dependencies": {
+    "request": "^2.88.2"
+  }
+}
