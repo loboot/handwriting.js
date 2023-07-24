@@ -60,3 +60,18 @@ test('promise then: output 1 3 2 in order', () => {
       }
     );
 });
+
+test('resolve number', () => {
+  const p = Promise.resolve(123);
+  return p.then((res) => {
+    expect(res).toBe(123);
+  });
+});
+
+test('resolve promise', () => {
+  const original = Promise.resolve(33);
+  const cast = Promise.resolve(original);
+  return cast.then((value) => {
+    expect(value).toBe(33);
+  });
+});

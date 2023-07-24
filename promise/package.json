@@ -4,7 +4,7 @@
   "description": "",
   "main": "promise.js",
   "scripts": {
-    "test": "promises-aplus-tests promise-a-plus.js",
+    "test": "promises-aplus-tests ./src/promise-a-plus.js",
     "test-jest": "jest "
   },
   "author": "",

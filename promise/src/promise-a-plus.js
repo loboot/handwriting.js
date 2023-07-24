@@ -154,20 +154,22 @@
   };
 
   /**
-   * 函数对象方法
-   * @param {any} value
+   * 静态方法-给定值转为promise。
+   * @param {any} value value为thenable对象，调用then。
    * @returns {Promise} 返回指定结果的Promise
    */
-  Promise.resolve = function (value) {};
+  Promise.resolve = function (value) {
+    return new Promise((resolve, reject) => {
+      if (value instanceof Promise) {
+        value.then(resolve, reject);
+      } else {
+        resolve(value);
+      }
+    });
+  };
 
   window.Promise = Promise;
 })(globalThis);
-
-const p1 = new Promise((resolve) => {
-  resolve(1);
-});
-
-p1.then();
 
 // test
 Promise.deferred = function () {
