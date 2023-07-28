@@ -90,7 +90,7 @@
   }
 
   /**
-   * Promise实例then方法
+   * 实例方法-then方法
    * @param {Function} onFulfilled
    * @param {Function} onRejected
    * @returns {Promise}  返回一个promise
@@ -154,6 +154,16 @@
   };
 
   /**
+   * 实例方法-注册一个promise被拒绝时的函数 Promise.prototype.then(undefined,onRejected)
+   * @param {Function} onRejected
+   * @returns {Promise}  返回一个promise
+   */
+
+  Promise.prototype.catch = function (onRejected) {
+    return Promise.prototype.then.call(this, undefined, onRejected);
+  };
+
+  /**
    * 静态方法-给定值转为promise。
    * @param {any} value value为thenable对象，调用then。
    * @returns {Promise} 返回指定结果的Promise
@@ -164,6 +174,113 @@
         value.then(resolve, reject);
       } else {
         resolve(value);
+      }
+    });
+  };
+
+  /**
+   * 静态方法-返回拒绝的Promise
+   * @param {any} reason
+   * @returns {Promise}
+   */
+  Promise.reject = function (reason) {
+    return new Promise((undefined, reject) => {
+      reject(reason);
+    });
+  };
+
+  /**
+   * 静态方法-接收promise可迭代对象，返回最快被处理(resolve\reject)的promise
+   * @param {Array<Promise>} arr
+   * @returns {Promise}
+   */
+  Promise.race = function (arr) {
+    return new Promise((resolve, reject) => {
+      for (let i = 0; i < arr.length; i++) {
+        Promise.resolve(arr[i]).then(
+          (value) => {
+            resolve(value);
+          },
+          (reason) => {
+            reject(reason);
+          }
+        );
+      }
+    });
+  };
+
+  /**
+   * 静态方法-返回任意时刻被resolve的Promise
+   * @param {Array<Promise>} arr
+   * @returns {Promise}
+   */
+
+  Promise.any = function (arr) {
+    return new Promise((resolve, reject) => {
+      if (!arr.length) {
+        reject();
+      }
+      let errorCount = 0;
+      for (let i = 0; i < arr.length; i++) {
+        const p = Promise.resolve(arr[i]).then(
+          (value) => {
+            resolve(value);
+          },
+          (reason) => {
+            errorCount++;
+            if (errorCount === arr.length) reject('AggregateError: All promises were rejected');
+          }
+        );
+      }
+    });
+  };
+
+  /**
+   * 静态方法-返回全部被兑现的Promise数组
+   * @param {Array<Promise>} arr
+   * @returns {Array<Promise>}
+   */
+
+  Promise.all = function (arr) {
+    return new Promise(function (resolve, reject) {
+      const promises = [];
+      for (let i = 0; i < arr.length; i++) {
+        Promise.resolve(arr[i]).then(
+          (value) => {
+            if (!(arr[i] instanceof Promise)) {
+              promises.push(arr[i]);
+            } else {
+              promises.push(Promise.resolve(arr[i]));
+            }
+            if (i === arr.length - 1) resolve(promises);
+          },
+          (reason) => {
+            return reject(Promise.reject(reason));
+          }
+        );
+      }
+    });
+  };
+
+  Promise.allSettled = function (arr) {
+    return new Promise(function (resolve, reject) {
+      if (!arr.length) resolve([]);
+      const promises = [];
+      for (let i = 0; i < arr.length; i++) {
+        if (!arr[i] instanceof Promise) {
+          promises.push(arr[i]);
+        } else {
+          Promise.resolve(arr[i]).then(
+            (value) => {
+              promises.push(Promise.resolve(arr[i]));
+              if (i === arr.length - 1) resolve(promises);
+            },
+            (reason) => {
+              promises.push(Promise.reject(arr[i]));
+              if (i === arr.length - 1) resolve(promises);
+            }
+          );
+        }
       }
     });
   };
